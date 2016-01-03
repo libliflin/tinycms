@@ -1,0 +1,10 @@
+{
+    "WorkingDir": "{GOPATH}/src/github.com/libliflin/tinycms",
+    "SourceDir": [
+        "{GOPATH}/src/github.com/libliflin/tinycms"
+    ],
+    "SourceExt": [".go", ".html", ".js"],
+    "BuildCmd": "go build",
+    "RunCmd": "tinycms.exe",
+    "Decreasing": 1
+}
