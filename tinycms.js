@@ -52,18 +52,27 @@ if (!Function.prototype.bind) {
 		cms.posturl = "edit/" + cms.locator;
 		cms.geturl = "view/" + cms.locator;
 		cms.instanceReady = function(evt){
-			if(console &*)
-			console.assert(evt.editor === cms.editor);
+			// console.assert(evt.editor === cms.editor);
 			// go get the current data for this element.
-			jQuery.get(cms.geturl, function(data){
-				// first give it to ck, and have it do it's formatting.
-				cms.editor.setData(data);
-				// then take it and stick it in our dirty checker.
-				cms.data = cms.oldData = cms.editor.getData();
-				cms.periodicData();
-			});
-
+			jQuery.get(cms.geturl, cms.initWithData.bind(cms));
 		};
+		cms.initWithData = function(data){
+			// first give it to ck, and have it do it's formatting.
+			// http://docs.ckeditor.com/#!/api/CKEDITOR.editor-method-setData
+			cms.editor.setData(data);
+			// then take it and stick it in our dirty checker.
+			// http://docs.ckeditor.com/#!/api/CKEDITOR.editor-method-getData
+			cms.data = cms.oldData = cms.editor.getData();
+			cms.periodicData();
+		}
+		// every 1 second, check to see if data has changed. 
+		// the user will lose data they edit within (up to) one second
+		// of closing the window.
+		// http://stackoverflow.com/questions/13922002/how-do-i-save-inline-editor-contents-on-the-server
+		cms.periodicData = function(){
+			cms.postIfChanged();
+			setTimeout( cms.periodicData.bind(cms), 1000 );
+		}
 		// maybe we can register this with onclose??
 		cms.postIfChanged = function(){
 			if( ( cms.data = cms.editor.getData() ) !== cms.oldData ){
@@ -74,16 +83,8 @@ if (!Function.prototype.bind) {
 					'data': cms.data,
 					'gorilla.csrf.Token': ''
 				};
-				jQuery.post(cms.posturl, {'data': cms.data});
+				jQuery.post(cms.posturl, postData);
 			}
-		}
-		// every 1 second, check to see if data has changed. 
-		// the user will lose data they edit within (up to) one second
-		// of closing the window.
-		// http://stackoverflow.com/questions/13922002/how-do-i-save-inline-editor-contents-on-the-server
-		cms.periodicData = function(){
-			cms.postIfChanged();
-			setTimeout( cms.periodicData.bind(cms), 1000 );
 		}
 		//http://docs.ckeditor.com/#!/api/CKEDITOR-event-instanceReady
 		cms.editor.on('instanceReady', cms.instanceReady.bind(cms))

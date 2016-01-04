@@ -19,6 +19,7 @@ func main() {
 	db = make(map[string]string)
 	r := mux.NewRouter()
 	r.HandleFunc("/index.html", servePage("index.html"))
+	r.HandleFunc("/tinycms.js", servePage("tinycms.js"))
 	r.PathPrefix("/view/").HandlerFunc(view)
 	r.PathPrefix("/edit/").HandlerFunc(edit)
 	http.Handle("/", r)
