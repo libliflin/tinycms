@@ -42,6 +42,10 @@ func view(w http.ResponseWriter, r *http.Request) {
 	v := db[k]
 	fmt.Printf("Getting db[%#v]=%#v\n", k, v)
 	w.Header().Set("Content-Type", "text/html")
+	// http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1.
+	w.Header().Set("Pragma", "no-cache")                                   // HTTP 1.0.
+	w.Header().Set("Expires", "0")                                         // Proxies.
 	_, _ = w.Write([]byte(v))
 }
 
